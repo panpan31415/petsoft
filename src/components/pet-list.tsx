@@ -1,11 +1,9 @@
-import Image from "next/image";
+"use client";
 import PetListItem from "./pet-list-item";
-import { Pet } from "@/lib/types";
+import usePets from "@/hooks/usePets";
 
-type PetListProps = {
-    pets: Pet[];
-};
-export default function PetList({ pets }: PetListProps) {
+export default function PetList() {
+    const [pets] = usePets();
     return (
         <ul className='bg-white border-b border-black/[0.08]'>
             {pets.map((pet) => (
