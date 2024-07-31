@@ -1,6 +1,6 @@
-import { Pet } from "@/app/lib/types";
 import Image from "next/image";
 import PetListItem from "./pet-list-item";
+import { Pet } from "@/lib/types";
 
 type PetListProps = {
     pets: Pet[];
