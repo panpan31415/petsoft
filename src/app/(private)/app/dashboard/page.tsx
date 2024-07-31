@@ -15,17 +15,17 @@ export default function DashboardPage() {
                     label='Current guests'
                 />
             </div>
-            <div className='grid grid-cols-3 grid-rows-[45px_1fr] gap-4 h-[600px]'>
-                <div className='row-start-1 row-end-2 col-start-1 col-end-2'>
+            <div className='grid grid-cols-1 md:grid-cols-3 md:grid-rows-[45px_1fr] grid-rows-[45px_300px_500px] gap-4 md:h-[600px]'>
+                <div className='md:row-start-1 md:row-end-2 md:col-start-1 md:col-end-2'>
                     <SearchFrom />
                 </div>
-                <div className='row-start-2 row-span-1 col-start-1 col-span-1'>
+                <div className='md:row-start-2 md:row-span-1 md:col-start-1 md:col-span-1'>
                     <ContentBlock>
                         <PetList />
                     </ContentBlock>
                 </div>
 
-                <div className='row-start-1 row-span-2 col-start-2 col-span-2'>
+                <div className='md:row-start-1 md:row-span-2 md:col-start-2 md:col-span-2'>
                     <ContentBlock>
                         <PetDetails />
                     </ContentBlock>
