@@ -1,10 +1,10 @@
-import { Pet } from "@/app/lib/types";
 import Branding from "@/components/branding";
 import ContentBlock from "@/components/content-bock";
 import PetDetails from "@/components/pet-details";
 import PetList from "@/components/pet-list";
 import SearchFrom from "@/components/search-form";
 import Stats from "@/components/stats";
+import { Pet } from "@/lib/types";
 
 const PET_API = "https://bytegrad.com/course-assets/projects/petsoft/api/pets";
 
