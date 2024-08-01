@@ -1,12 +1,14 @@
-type StatsProps = {
-    value: number;
-    label: string;
-};
-export default function Stats({ value, label }: StatsProps) {
+"use client";
+
+import usePetContext from "@/hooks/usePetContext";
+
+export default function Stats() {
+    const petContext = usePetContext();
+
     return (
         <section className='text-center'>
-            <p className='text-2xl font-bold leading-6'>{value}</p>
-            <p className='opacity-80'>{label}</p>
+            <p className='text-2xl font-bold leading-6'>{petContext?.numberOfPets || 0}</p>
+            <p className='opacity-80'>current guests</p>
         </section>
     );
 }
