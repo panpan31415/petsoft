@@ -1,13 +1,23 @@
+import useSelectedPetId from "@/hooks/useSelectedPetId";
 import { Pet } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 type PetListItemProps = {
     pet: Pet;
 };
 export default function PetListItem({ pet }: PetListItemProps) {
+    const [selectedPetId, setSelectedPetId] = useSelectedPetId();
     return (
         <li>
-            <button className='h-[70px] w-full cursor-pointer flex items-center gap-3 px-5 text-base hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition'>
+            <button
+                onClick={() => setSelectedPetId(pet.id)}
+                className={cn(
+                    "h-[70px] w-full cursor-pointer flex items-center gap-3 px-5 text-base hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition",
+                    {
+                        "bg-[#EFF1F2]": selectedPetId === pet.id,
+                    },
+                )}>
                 <Image
                     src={pet.imageUrl}
                     alt={pet.name}
