@@ -11,6 +11,8 @@ export type PetContextValue = {
     setSelectedPetId: (petId: string) => void;
     searchText: string;
     setSearchText: (text: string) => void;
+    addPet: (pet: Omit<Pet, "id">) => void;
+    editPet: (editedPet: Pet) => void;
     deletePet: (petId: string) => void;
 } | null;
 
@@ -31,6 +33,17 @@ export default function PetContextProvider({ children, data }: PetContextProvide
         setPets((pets) => pets.filter((pet) => pet.id !== petId));
     };
 
+    const addPet = (newPet: Omit<Pet, "id">) => {
+        // ignoring possible duplicating pets
+        const petId = Date.now().toString();
+        setPets((prevPets) => [...prevPets, { id: petId, ...newPet }]);
+    };
+
+    const editPet = (editedPet: Pet) => {
+        const restPets = pets.filter((pet) => pet.id !== editedPet.id);
+        setPets([...restPets, editedPet]);
+    };
+
     return (
         <PetContext.Provider
             value={{
@@ -42,6 +55,8 @@ export default function PetContextProvider({ children, data }: PetContextProvide
                 numberOfPets,
                 searchText,
                 setSearchText,
+                addPet,
+                editPet,
                 deletePet,
             }}>
             {children}

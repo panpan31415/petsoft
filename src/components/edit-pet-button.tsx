@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import EditPetForm from "./edit-pet-form";
 
 export default function EditPetButton() {
+    const [open, setOpen] = useState(false);
     return (
-        <Dialog>
+        <Dialog
+            open={open}
+            onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button
                     variant={"secondary"}
@@ -17,7 +20,7 @@ export default function EditPetButton() {
                 <DialogHeader>
                     <DialogTitle>Edit pet</DialogTitle>
                 </DialogHeader>
-                <EditPetForm />
+                <EditPetForm setOpen={setOpen} />
             </DialogContent>
         </Dialog>
     );
