@@ -1,3 +1,4 @@
+import AddPetButton from "@/components/add-pet-button";
 import Branding from "@/components/branding";
 import ContentBlock from "@/components/content-bock";
 import PetDetails from "@/components/pet-details";
@@ -17,8 +18,9 @@ export default async function DashboardPage() {
                     <SearchFrom />
                 </div>
                 <div className='md:row-start-2 md:row-span-1 md:col-start-1 md:col-span-1'>
-                    <ContentBlock>
+                    <ContentBlock className='relative'>
                         <PetList />
+                        <AddPetButton />
                     </ContentBlock>
                 </div>
 

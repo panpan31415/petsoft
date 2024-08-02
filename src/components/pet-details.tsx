@@ -3,6 +3,8 @@ import usePetContext from "@/hooks/usePetContext";
 import usePets from "@/hooks/usePets";
 import useSelectedPetId from "@/hooks/useSelectedPetId";
 import Image from "next/image";
+import EditPetButton from "./edit-pet-button";
+import CheckoutPetButton from "./checkout-pet-button";
 
 export default function PetDetails() {
     const petContext = usePetContext();
@@ -38,6 +40,10 @@ function TopBar({ imageUrl, petName }: TopBarProps) {
                 className={" rounded-full w-[75px] h-[75px] object-cover"}
             />
             <h2 className='font-semibold leading-7 text-3xl ml-5'>{petName}</h2>
+            <div className='ml-auto space-x-2'>
+                <EditPetButton />
+                <CheckoutPetButton />
+            </div>
         </section>
     );
 }
