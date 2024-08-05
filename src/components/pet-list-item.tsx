@@ -13,9 +13,9 @@ export default function PetListItem({ pet }: PetListItemProps) {
             <button
                 onClick={() => setSelectedPetId(pet.id)}
                 className={cn(
-                    "h-[70px] w-full cursor-pointer flex items-center gap-3 px-5 text-base hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition",
+                    "h-[70px] w-full cursor-pointer flex items-center gap-3 px-5 text-base hover:bg-primary/20 focus:bg-primary/20 transition",
                     {
-                        "bg-[#EFF1F2]": selectedPetId === pet.id,
+                        "bg-primary/20": selectedPetId === pet.id,
                     },
                 )}>
                 <Image
