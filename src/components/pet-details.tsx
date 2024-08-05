@@ -1,7 +1,5 @@
 "use client";
 import usePetContext from "@/hooks/usePetContext";
-import usePets from "@/hooks/usePets";
-import useSelectedPetId from "@/hooks/useSelectedPetId";
 import Image from "next/image";
 import EditPetButton from "./edit-pet-button";
 import CheckoutPetButton from "./checkout-pet-button";

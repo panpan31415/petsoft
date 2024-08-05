@@ -4,28 +4,20 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { FormEvent } from "react";
-import { Pet } from "@/lib/types";
-import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import usePetContext from "@/hooks/usePetContext";
+import SubmitFromButton from "./submit-button";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
-    const petContext = usePetContext();
-    const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const newPet: Omit<Pet, "id"> = {
-            name: formData.get("name") as string,
-            ownerName: formData.get("ownerName") as string,
-            age: Number(formData.get("age") || 0),
-            notes: formData.get("notes") as string,
-            imageUrl: (formData.get("imageUrl") || DEFAULT_PET_IMAGE) as string,
-        };
-        petContext?.addPet(newPet);
+    const petContest = usePetContext();
+    const addPetAction = async (formData: FormData) => {
+        if (petContest) {
+            await petContest.addPet(formData);
+        }
         setOpen(false);
     };
+
     return (
-        <form onSubmit={onSubmit}>
+        <form action={addPetAction}>
             <div className='grid gap-4 py-4'>
                 <div className='grid grid-cols-4 items-center gap-3'>
                     <Label
@@ -103,11 +95,7 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                 </div>
             </div>
             <DialogFooter>
-                <Button
-                    type='submit'
-                    className='rounded-full'>
-                    Add a new pet
-                </Button>
+                <SubmitFromButton>Add a new pet</SubmitFromButton>
             </DialogFooter>
         </form>
     );

@@ -1,22 +1,23 @@
 "use client";
 import usePetContext from "@/hooks/usePetContext";
 import PetListItem from "./pet-list-item";
-import usePets from "@/hooks/usePets";
 
 export default function PetList() {
-    const [pets] = usePets();
     const petContext = usePetContext();
-    const searchText = petContext?.searchText || "";
-    const filteredPets = pets.filter((pet) => pet.name.toLowerCase().includes(searchText.toLowerCase()));
-
-    return (
-        <ul className='bg-white border-b border-light'>
-            {filteredPets.map((pet) => (
-                <PetListItem
-                    key={pet.id}
-                    pet={pet}
-                />
-            ))}
-        </ul>
-    );
+    if (petContext) {
+        const pets = petContext.pets;
+        const searchText = petContext.searchText || "";
+        const filteredPets = pets.filter((pet) => pet.name.toLowerCase().includes(searchText.toLowerCase()));
+        return (
+            <ul className='bg-white border-b border-light'>
+                {filteredPets.map((pet) => (
+                    <PetListItem
+                        key={pet.id}
+                        pet={pet}
+                    />
+                ))}
+            </ul>
+        );
+    }
+    return null;
 }
