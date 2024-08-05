@@ -3,18 +3,13 @@ import AppHeader from "@/components/app-header";
 import BackgroundPattern from "@/components/background-pattern";
 import { ReactNode } from "react";
 import PetContextProvider from "@/contexts/pet-context-provider";
-import { PET_API } from "@/lib/constants";
-import { Pet } from "@/lib/types";
+import prisma from "@/lib/db";
 
 type LayoutProps = {
     children: ReactNode;
 };
 export default async function Layout({ children }: LayoutProps) {
-    const response = await fetch(PET_API);
-    if (!response.ok) {
-        throw new Error("Could not fetch data");
-    }
-    const pets: Pet[] = await response.json();
+    const pets = await prisma.pet.findMany();
     return (
         <>
             <BackgroundPattern />
