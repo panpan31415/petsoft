@@ -1,29 +1,34 @@
 "use client";
-import React, { FormEvent } from "react";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import usePetContext from "@/hooks/usePetContext";
-import { Pet } from "@/lib/types";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
+import { Pet } from "@prisma/client";
+import { editPet } from "@/actions";
+import { toast } from "sonner";
 
 export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
     const selectedPetId = petContext?.selectedPetId;
     const pets = petContext?.pets;
     const selectedPet: Pet | undefined = pets?.find((pet) => pet.id === selectedPetId);
-    const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (petContext && selectedPet) {
-            petContext.editPet(selectedPet);
+    const [editedPet, setEditedPet] = useState(selectedPet);
+    const formActionHandler = async () => {
+        if (selectedPetId && petContext && selectedPet && editedPet) {
+            const response = await editPet(editedPet);
+            response.ok
+                ? toast.success(response.message, { position: "top-center" })
+                : toast.warning(response.message, { position: "top-center" });
         }
         setOpen(false);
     };
     return (
-        selectedPet && (
-            <form onSubmit={onSubmit}>
+        editedPet && (
+            <form action={formActionHandler}>
                 <div className='grid gap-4 py-4'>
                     <div className='grid grid-cols-4 items-center gap-3'>
                         <Label
@@ -37,10 +42,10 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='Your pet name'
                             className='col-span-full'
-                            value={selectedPet?.name || ""}
+                            value={editedPet?.name || ""}
                             required
                             onChange={(event) => {
-                                petContext?.editPet({ ...selectedPet, name: event.target.value });
+                                editedPet && setEditedPet({ ...editedPet, name: event.target.value });
                             }}
                         />
                     </div>
@@ -56,10 +61,10 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='owner name'
                             className='col-span-full'
-                            value={selectedPet.ownerName}
+                            value={editedPet.ownerName}
                             required
                             onChange={(event) => {
-                                petContext?.editPet({ ...selectedPet, ownerName: event.target.value });
+                                editedPet && setEditedPet({ ...editedPet, ownerName: event.target.value });
                             }}
                         />
                     </div>
@@ -75,12 +80,13 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='pet image URL'
                             className='col-span-full'
-                            value={selectedPet?.imageUrl || ""}
+                            value={editedPet?.imageUrl || ""}
                             onChange={(event) => {
-                                petContext?.editPet({
-                                    ...selectedPet,
-                                    imageUrl: event.target.value || DEFAULT_PET_IMAGE,
-                                });
+                                editedPet &&
+                                    setEditedPet({
+                                        ...editedPet,
+                                        imageUrl: event.target.value || DEFAULT_PET_IMAGE,
+                                    });
                             }}
                         />
                     </div>
@@ -97,9 +103,9 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             placeholder='pet age'
                             className='col-span-full'
                             type='number'
-                            value={selectedPet?.age || 0}
+                            value={editedPet?.age || 0}
                             onChange={(event) => {
-                                petContext?.editPet({ ...selectedPet, age: Number(event.target.value) });
+                                editedPet && setEditedPet({ ...editedPet, age: Number(event.target.value) });
                             }}
                         />
                     </div>
@@ -115,9 +121,9 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='Add some pet notes here.'
                             className='col-span-full'
-                            value={selectedPet?.notes || ""}
+                            value={editedPet?.notes || ""}
                             onChange={(event) => {
-                                petContext?.editPet({ ...selectedPet, notes: event.target.value });
+                                editedPet && setEditedPet({ ...editedPet, notes: event.target.value });
                             }}
                         />
                     </div>

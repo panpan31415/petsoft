@@ -3,21 +3,34 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
-import { Button } from "./ui/button";
 import usePetContext from "@/hooks/usePetContext";
 import SubmitFromButton from "./submit-button";
+import { addPet } from "@/actions";
+import { toast } from "sonner";
+import { PetFormData } from "@/lib/types";
+import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
-    const petContest = usePetContext();
-    const addPetAction = async (formData: FormData) => {
-        if (petContest) {
-            await petContest.addPet(formData);
+    const petContext = usePetContext();
+    const formActionHandler = async (formData: FormData) => {
+        if (petContext) {
+            const pet: PetFormData = {
+                name: formData.get("name") as string,
+                ownerName: formData.get("ownerName") as string,
+                age: parseInt(formData.get("age") as string),
+                imageUrl: (formData.get("imageUrl") as string) || DEFAULT_PET_IMAGE,
+                notes: formData.get("notes") as string,
+            };
+            const response = await addPet(pet);
+            response.ok
+                ? toast.success(response.message, { position: "top-center" })
+                : toast.warning(response.message, { position: "top-center" });
         }
         setOpen(false);
     };
 
     return (
-        <form action={addPetAction}>
+        <form action={formActionHandler}>
             <div className='grid gap-4 py-4'>
                 <div className='grid grid-cols-4 items-center gap-3'>
                     <Label
