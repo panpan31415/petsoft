@@ -27,7 +27,7 @@ export const editPetAction: OptimisticActionCreator<Pet> = (pet) => {
 
 export const deletePetAction: OptimisticActionCreator<string> = (petId) => {
     return {
-        type: "edit",
+        type: "delete",
         payload: petId,
     };
 };
@@ -44,7 +44,7 @@ export const optimisticReducer: (state: Pet[], action: OptimisticAction<any>) =>
                 return pet;
             });
         case "delete":
-            return state.filter((pet) => pet.id !== action.payload.petId);
+            return state.filter((pet) => pet.id !== action.payload);
         default:
             return state;
     }
