@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
+import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 export async function addPet(pet: PetFormData) {
     await sleep(2000);
     let response = {
@@ -13,7 +14,13 @@ export async function addPet(pet: PetFormData) {
     };
     try {
         await prisma.pet.create({
-            data: pet,
+            data: {
+                name: pet.name,
+                ownerName: pet.ownerName,
+                age: pet.age,
+                imageUrl: pet.imageUrl || DEFAULT_PET_IMAGE,
+                notes: pet.notes,
+            },
         });
         response = {
             ok: true,
@@ -42,10 +49,10 @@ export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
                 id: newPet.id,
             },
             data: {
-                name: newPet.id,
+                name: newPet.name,
                 ownerName: newPet.ownerName,
                 age: newPet.age,
-                imageUrl: newPet.imageUrl,
+                imageUrl: newPet.imageUrl || DEFAULT_PET_IMAGE,
                 notes: newPet.notes,
             },
         });
@@ -54,6 +61,7 @@ export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
             message: "update pet successfully",
         };
     } catch (error) {
+        console.log(error);
         response = {
             ok: false,
             message: "Could not update pet",

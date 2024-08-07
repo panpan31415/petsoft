@@ -6,10 +6,10 @@ import { flushSync } from "react-dom";
 export default function CheckoutPetButton() {
     const petContext = usePetContext();
     const selectedPetId = petContext?.selectedPetId;
-    const onClickHandler = async () => {
+    const onClickHandler = () => {
         if (selectedPetId) {
-            flushSync(() => petContext.deletePet(selectedPetId));
-            flushSync(() => petContext.setSelectedPetId(""));
+            petContext.setSelectedPetId("");
+            petContext.deletePet(selectedPetId);
         }
     };
     return (

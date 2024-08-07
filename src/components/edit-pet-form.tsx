@@ -9,21 +9,39 @@ import usePetContext from "@/hooks/usePetContext";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import { Pet } from "@prisma/client";
 import { flushSync } from "react-dom";
+import { useForm } from "react-hook-form";
+import { PetFormData } from "@/lib/types";
 
 export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
     const selectedPetId = petContext?.selectedPetId;
     const pets = petContext?.pets;
     const selectedPet: Pet | undefined = pets?.find((pet) => pet.id === selectedPetId);
-    const [editedPet, setEditedPet] = useState(selectedPet);
-    const formActionHandler = async () => {
-        if (selectedPetId && petContext && selectedPet && editedPet) {
-            flushSync(() => setOpen(false));
-            flushSync(() => petContext.editPet(editedPet));
+    const {
+        register,
+        trigger,
+        formState: { errors },
+    } = useForm<PetFormData>();
+    const formActionHandler = async (formData: FormData) => {
+        const result = await trigger();
+        if (!result) {
+            return;
+        }
+        flushSync(() => setOpen(false));
+        if (selectedPetId && petContext && selectedPet) {
+            petContext.editPet({
+                ...selectedPet,
+                name: formData.get("name") as string,
+                age: parseInt(formData.get("age") as string),
+                imageUrl: formData.get("imageUrl") ? (formData.get("imageUrl") as string) : DEFAULT_PET_IMAGE,
+                ownerName: formData.get("ownerName") as string,
+                notes: formData.get("notes") as string,
+            });
         }
     };
+
     return (
-        editedPet && (
+        selectedPet && (
             <form action={formActionHandler}>
                 <div className='grid gap-4 py-4'>
                     <div className='grid grid-cols-4 items-center gap-3'>
@@ -33,17 +51,15 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             Name
                         </Label>
                         <Input
-                            name={"name"}
                             id='pet-name'
                             defaultValue=''
                             placeholder='Your pet name'
                             className='col-span-full'
-                            value={editedPet?.name || ""}
-                            required
-                            onChange={(event) => {
-                                editedPet && setEditedPet({ ...editedPet, name: event.target.value });
-                            }}
+                            {...register("name", {
+                                required: "please give pet a name",
+                            })}
                         />
+                        {errors.name && <p className='text-red-500 col-span-full'>{errors.name.message}</p>}
                     </div>
                     <div className='grid grid-cols-4 items-center gap-2'>
                         <Label
@@ -52,17 +68,15 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             Owner Name
                         </Label>
                         <Input
-                            name={"ownerName"}
                             id='owner-name'
                             defaultValue=''
                             placeholder='owner name'
                             className='col-span-full'
-                            value={editedPet.ownerName}
-                            required
-                            onChange={(event) => {
-                                editedPet && setEditedPet({ ...editedPet, ownerName: event.target.value });
-                            }}
+                            {...register("ownerName", {
+                                required: "please type owner name",
+                            })}
                         />
+                        {errors.ownerName && <p className='text-red-500 col-span-full'>{errors.ownerName.message}</p>}
                     </div>
                     <div className='grid grid-cols-4 items-center gap-2'>
                         <Label
@@ -76,16 +90,9 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='pet image URL'
                             className='col-span-full'
-                            value={editedPet?.imageUrl || ""}
-                            onChange={(event) => {
-                                editedPet &&
-                                    setEditedPet({
-                                        ...editedPet,
-                                        imageUrl: event.target.value || DEFAULT_PET_IMAGE,
-                                    });
-                            }}
                         />
                     </div>
+                    {errors.imageUrl && <p className='text-red-500 col-span-full'>{errors.imageUrl.message}</p>}
                     <div className='grid grid-cols-4 items-center gap-2'>
                         <Label
                             htmlFor='pet-age'
@@ -93,17 +100,16 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             Pet Age
                         </Label>
                         <Input
-                            name='age'
                             id='pet-age'
                             defaultValue={0}
                             placeholder='pet age'
                             className='col-span-full'
                             type='number'
-                            value={editedPet?.age || 0}
-                            onChange={(event) => {
-                                editedPet && setEditedPet({ ...editedPet, age: Number(event.target.value) });
-                            }}
+                            {...register("age", {
+                                required: "please type pet age",
+                            })}
                         />
+                        {errors.age && <p className='text-red-500 col-span-full'>{errors.age.message}</p>}
                     </div>
                     <div className='grid grid-cols-4 items-center gap-2'>
                         <Label
@@ -112,16 +118,15 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             Notes
                         </Label>
                         <Textarea
-                            name={"notes"}
                             id='pet-notes'
                             defaultValue=''
                             placeholder='Add some pet notes here.'
                             className='col-span-full'
-                            value={editedPet?.notes || ""}
-                            onChange={(event) => {
-                                editedPet && setEditedPet({ ...editedPet, notes: event.target.value });
-                            }}
+                            {...register("notes", {
+                                required: "please leave some notes to your pet",
+                            })}
                         />
+                        {errors.notes && <p className='text-red-500 col-span-full'>{errors.notes.message}</p>}
                     </div>
                 </div>
                 <DialogFooter>
