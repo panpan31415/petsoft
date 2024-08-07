@@ -1,5 +1,4 @@
 import { PetContext, PetContextValue } from "@/contexts/pet-context-provider";
-import { Pet } from "@/lib/types";
 import { useContext } from "react";
 
 export default function usePetContext(): PetContextValue {
