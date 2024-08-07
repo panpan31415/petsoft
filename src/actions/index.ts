@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
+import { Pet } from "@prisma/client";
 export async function addPet(pet: PetFormData) {
     await sleep(2000);
     let response = {
@@ -12,9 +13,7 @@ export async function addPet(pet: PetFormData) {
     };
     try {
         await prisma.pet.create({
-            data: {
-                ...pet,
-            },
+            data: pet,
         });
         response = {
             ok: true,
@@ -31,7 +30,7 @@ export async function addPet(pet: PetFormData) {
     }
 }
 
-export async function editPet(newPet: PetFormData & { id: string }) {
+export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
     await sleep(2000);
     let response = {
         ok: false,
@@ -43,7 +42,7 @@ export async function editPet(newPet: PetFormData & { id: string }) {
                 id: newPet.id,
             },
             data: {
-                name: newPet.name,
+                name: newPet.id,
                 ownerName: newPet.ownerName,
                 age: newPet.age,
                 imageUrl: newPet.imageUrl,
@@ -65,7 +64,7 @@ export async function editPet(newPet: PetFormData & { id: string }) {
     }
 }
 
-export async function deletePet(id: string) {
+export async function deletePet(id: Pet["id"]) {
     await sleep(2000);
     let response = {
         ok: false,

@@ -8,8 +8,7 @@ import { Button } from "./ui/button";
 import usePetContext from "@/hooks/usePetContext";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import { Pet } from "@prisma/client";
-import { editPet } from "@/actions";
-import { toast } from "sonner";
+import { flushSync } from "react-dom";
 
 export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
@@ -19,12 +18,9 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
     const [editedPet, setEditedPet] = useState(selectedPet);
     const formActionHandler = async () => {
         if (selectedPetId && petContext && selectedPet && editedPet) {
-            const response = await editPet(editedPet);
-            response.ok
-                ? toast.success(response.message, { position: "top-center" })
-                : toast.warning(response.message, { position: "top-center" });
+            flushSync(() => setOpen(false));
+            flushSync(() => petContext.editPet(editedPet));
         }
-        setOpen(false);
     };
     return (
         editedPet && (

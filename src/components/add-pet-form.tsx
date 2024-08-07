@@ -5,10 +5,10 @@ import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
 import usePetContext from "@/hooks/usePetContext";
 import SubmitFromButton from "./submit-button";
-import { addPet } from "@/actions";
-import { toast } from "sonner";
+
 import { PetFormData } from "@/lib/types";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
+import { flushSync } from "react-dom";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
@@ -21,12 +21,9 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                 imageUrl: (formData.get("imageUrl") as string) || DEFAULT_PET_IMAGE,
                 notes: formData.get("notes") as string,
             };
-            const response = await addPet(pet);
-            response.ok
-                ? toast.success(response.message, { position: "top-center" })
-                : toast.warning(response.message, { position: "top-center" });
+            flushSync(() => setOpen(false));
+            flushSync(() => petContext.addPet(pet));
         }
-        setOpen(false);
     };
 
     return (
