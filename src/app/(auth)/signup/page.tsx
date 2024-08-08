@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 export default function SignUpPage() {
     return (
         <main>
-            <H1 className={"text-center "}>Log in</H1>
-            <AuthForm type='Log In' />
+            <H1 className={"text-center "}>Sign Up</H1>
+            <AuthForm type='Sign Up' />
             <p className='mt-6 text-sm text-zinc-500'>
                 Have an account already?{" "}
                 <Link
