@@ -6,20 +6,30 @@ import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
+import { petFormSchema } from "@/lib/validation";
 export async function addPet(pet: PetFormData) {
-    await sleep(2000);
     let response = {
         ok: false,
         message: "",
     };
+    const validatedPet = petFormSchema.safeParse(pet);
+    if (!validatedPet.success) {
+        return {
+            ok: false,
+            message: "Invalid pet data",
+            error: validatedPet.error,
+        };
+    }
+    await sleep(2000);
+
     try {
         await prisma.pet.create({
             data: {
-                name: pet.name,
-                ownerName: pet.ownerName,
-                age: pet.age,
-                imageUrl: pet.imageUrl || DEFAULT_PET_IMAGE,
-                notes: pet.notes,
+                name: validatedPet.data.name,
+                ownerName: validatedPet.data.ownerName,
+                age: validatedPet.data.age,
+                imageUrl: validatedPet.data.imageUrl,
+                notes: validatedPet.data.notes,
             },
         });
         response = {
@@ -38,22 +48,31 @@ export async function addPet(pet: PetFormData) {
 }
 
 export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
-    await sleep(2000);
     let response = {
         ok: false,
         message: "",
     };
+    const validatedPet = petFormSchema.safeParse(newPet);
+    if (!validatedPet.success) {
+        return {
+            ok: false,
+            message: "Invalid pet data",
+            error: validatedPet.error,
+        };
+    }
+    await sleep(2000);
+
     try {
         await prisma.pet.update({
             where: {
                 id: newPet.id,
             },
             data: {
-                name: newPet.name,
-                ownerName: newPet.ownerName,
-                age: newPet.age,
-                imageUrl: newPet.imageUrl || DEFAULT_PET_IMAGE,
-                notes: newPet.notes,
+                name: validatedPet.data.name,
+                ownerName: validatedPet.data.ownerName,
+                age: validatedPet.data.age,
+                imageUrl: validatedPet.data.imageUrl,
+                notes: validatedPet.data.notes,
             },
         });
         response = {

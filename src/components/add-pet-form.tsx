@@ -9,30 +9,30 @@ import { PetFormData } from "@/lib/types";
 import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import { flushSync } from "react-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { petFormSchema } from "@/lib/validation";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
     const {
         register,
-        formState: { isSubmitting, errors },
+        formState: { errors },
         trigger,
-    } = useForm<PetFormData>();
+        getValues,
+    } = useForm<PetFormData>({ resolver: zodResolver(petFormSchema) });
 
-    const formActionHandler = async (formData: FormData) => {
+    const formActionHandler = async () => {
         const result = await trigger();
         if (!result) {
             return;
         }
         flushSync(() => setOpen(false));
         if (petContext) {
-            const pet: PetFormData = {
-                name: formData.get("name") as string,
-                ownerName: formData.get("ownerName") as string,
-                age: parseInt(formData.get("age") as string),
-                imageUrl: (formData.get("imageUrl") as string) || DEFAULT_PET_IMAGE,
-                notes: formData.get("notes") as string,
-            };
-            petContext.addPet(pet);
+            const pet = getValues();
+            petContext.addPet({
+                ...pet,
+                imageUrl: pet.imageUrl || DEFAULT_PET_IMAGE,
+            });
         }
     };
 
@@ -49,9 +49,7 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                         id='pet-name'
                         placeholder='Your pet name'
                         className='col-span-full'
-                        {...register("name", {
-                            required: "Name is required",
-                        })}
+                        {...register("name")}
                     />
                     {errors.name && <p className='text-red-500 col-span-full'>{errors.name.message}</p>}
                 </div>
@@ -68,9 +66,7 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                         defaultValue=''
                         placeholder='owner name'
                         type='text'
-                        {...register("ownerName", {
-                            required: "You must type owner name",
-                        })}
+                        {...register("ownerName")}
                     />
                     {errors.ownerName && <p className='text-red-500 col-span-full'>{errors.ownerName.message}</p>}
                 </div>
@@ -84,7 +80,7 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                         id='pet-image-url'
                         className='col-span-full'
                         defaultValue=''
-                        placeholder='owner name'
+                        placeholder='pet image'
                         type='text'
                         {...register("imageUrl")}
                     />
@@ -100,11 +96,8 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                         id='pet-age'
                         defaultValue={0}
                         placeholder='pet age'
-                        type='number'
                         className='col-span-full'
-                        {...register("age", {
-                            required: true,
-                        })}
+                        {...register("age")}
                     />
                     {errors.age && <p className='text-red-500 col-span-full'>{errors.age.message}</p>}
                 </div>
@@ -119,9 +112,7 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
                         defaultValue=''
                         placeholder='Add your pet notes here.'
                         className='col-span-full'
-                        {...register("notes", {
-                            required: "Please give us some notes to your pet",
-                        })}
+                        {...register("notes")}
                     />
                     {errors.notes && <p className='text-red-500 col-span-full'>{errors.notes.message}</p>}
                 </div>

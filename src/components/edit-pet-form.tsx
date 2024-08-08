@@ -1,16 +1,17 @@
 "use client";
-import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import usePetContext from "@/hooks/usePetContext";
-import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import { Pet } from "@prisma/client";
 import { flushSync } from "react-dom";
 import { useForm } from "react-hook-form";
 import { PetFormData } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { petFormSchema } from "@/lib/validation";
+import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 
 export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
@@ -20,8 +21,12 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
     const {
         register,
         trigger,
+        getValues,
         formState: { errors },
-    } = useForm<PetFormData>();
+    } = useForm<PetFormData>({
+        resolver: zodResolver(petFormSchema),
+        defaultValues: selectedPet,
+    });
     const formActionHandler = async (formData: FormData) => {
         const result = await trigger();
         if (!result) {
@@ -29,13 +34,11 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
         }
         flushSync(() => setOpen(false));
         if (selectedPetId && petContext && selectedPet) {
+            const petData = getValues();
             petContext.editPet({
                 ...selectedPet,
-                name: formData.get("name") as string,
-                age: parseInt(formData.get("age") as string),
-                imageUrl: formData.get("imageUrl") ? (formData.get("imageUrl") as string) : DEFAULT_PET_IMAGE,
-                ownerName: formData.get("ownerName") as string,
-                notes: formData.get("notes") as string,
+                ...petData,
+                imageUrl: petData.imageUrl || DEFAULT_PET_IMAGE,
             });
         }
     };
@@ -55,9 +58,7 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='Your pet name'
                             className='col-span-full'
-                            {...register("name", {
-                                required: "please give pet a name",
-                            })}
+                            {...register("name")}
                         />
                         {errors.name && <p className='text-red-500 col-span-full'>{errors.name.message}</p>}
                     </div>
@@ -72,9 +73,7 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='owner name'
                             className='col-span-full'
-                            {...register("ownerName", {
-                                required: "please type owner name",
-                            })}
+                            {...register("ownerName")}
                         />
                         {errors.ownerName && <p className='text-red-500 col-span-full'>{errors.ownerName.message}</p>}
                     </div>
@@ -85,11 +84,11 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             Image Url
                         </Label>
                         <Input
-                            name='imageUrl'
                             id='pet-image-url'
                             defaultValue=''
                             placeholder='pet image URL'
                             className='col-span-full'
+                            {...register("imageUrl")}
                         />
                     </div>
                     {errors.imageUrl && <p className='text-red-500 col-span-full'>{errors.imageUrl.message}</p>}
@@ -105,9 +104,7 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             placeholder='pet age'
                             className='col-span-full'
                             type='number'
-                            {...register("age", {
-                                required: "please type pet age",
-                            })}
+                            {...register("age")}
                         />
                         {errors.age && <p className='text-red-500 col-span-full'>{errors.age.message}</p>}
                     </div>
@@ -122,9 +119,7 @@ export default function EditPetForm({ setOpen }: { setOpen: (open: boolean) => v
                             defaultValue=''
                             placeholder='Add some pet notes here.'
                             className='col-span-full'
-                            {...register("notes", {
-                                required: "please leave some notes to your pet",
-                            })}
+                            {...register("notes")}
                         />
                         {errors.notes && <p className='text-red-500 col-span-full'>{errors.notes.message}</p>}
                     </div>
