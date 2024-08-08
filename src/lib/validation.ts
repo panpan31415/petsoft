@@ -18,3 +18,8 @@ export const petFormSchema = z
             imageUrl: formData.imageUrl || DEFAULT_PET_IMAGE,
         };
     });
+
+export const authFormSchema = z.object({
+    email: z.string().trim().email({ message: "please type valid email" }),
+    password: z.string().trim().min(6, { message: "password must have at lease 6 characters." }),
+});
