@@ -17,7 +17,7 @@ export default function SignUpPage() {
                 <Link
                     href={"/login"}
                     className='font-medium'>
-                    Sign up
+                    Log in
                 </Link>
             </p>
         </main>
