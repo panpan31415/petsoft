@@ -5,9 +5,10 @@ import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
-import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 import { petFormSchema } from "@/lib/validation";
+import { signIn, signOut } from "@/lib/auth";
 export async function addPet(pet: PetFormData) {
+    const userId = "clzmrw3q90000qmrylu2mg00q";
     let response = {
         ok: false,
         message: "",
@@ -30,6 +31,7 @@ export async function addPet(pet: PetFormData) {
                 age: validatedPet.data.age,
                 imageUrl: validatedPet.data.imageUrl,
                 notes: validatedPet.data.notes,
+                userId,
             },
         });
         response = {
@@ -117,4 +119,16 @@ export async function deletePet(id: Pet["id"]) {
         revalidatePath("/app", "layout");
         return response;
     }
+}
+
+export async function login(formData: FormData) {
+    const authData = Object.fromEntries(formData.entries());
+    // this signIn will pass authData to credential function in authorize function of auth module
+    await signIn("credentials", authData);
+}
+
+export async function signOutAction() {
+    await signOut({
+        redirectTo: "/",
+    });
 }
