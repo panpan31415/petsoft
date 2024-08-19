@@ -1,5 +1,4 @@
 // import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
 import { auth } from "./lib/auth";
 
 // export function middleware(req: Request) {

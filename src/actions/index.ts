@@ -6,9 +6,14 @@ import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
 import { petFormSchema } from "@/lib/validation";
-import { signIn, signOut } from "@/lib/auth";
+import { auth, signIn, signOut } from "@/lib/auth";
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 export async function addPet(pet: PetFormData) {
-    const userId = "clzmrw3q90000qmrylu2mg00q";
+    const session = await auth();
+    if (!session?.user) {
+        redirect("/login");
+    }
     let response = {
         ok: false,
         message: "",
@@ -31,7 +36,9 @@ export async function addPet(pet: PetFormData) {
                 age: validatedPet.data.age,
                 imageUrl: validatedPet.data.imageUrl,
                 notes: validatedPet.data.notes,
-                userId,
+                user: {
+                    connect: { id: session.user.id },
+                },
             },
         });
         response = {
@@ -122,13 +129,28 @@ export async function deletePet(id: Pet["id"]) {
 }
 
 export async function login(formData: FormData) {
-    const authData = Object.fromEntries(formData.entries());
     // this signIn will pass authData to credential function in authorize function of auth module
-    await signIn("credentials", authData);
+    await signIn("credentials", formData);
 }
 
 export async function signOutAction() {
     await signOut({
         redirectTo: "/",
     });
+}
+
+export async function signUp(formData: FormData) {
+    const email = formData.get("email") as string;
+    const hashedPassword = await bcrypt.hash(formData.get("password") as string, 10);
+    try {
+        await prisma.user.create({
+            data: {
+                email,
+                hashedPassword,
+            },
+        });
+        await signIn("credentials", formData);
+    } catch (error) {
+        console.log(error);
+    }
 }

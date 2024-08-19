@@ -37,8 +37,8 @@ export default function PetContextProvider({ children, pets }: PetContextProvide
     }, [selectedPetId, optimisticPets]);
 
     const addPetHandler = async (pet: PetFormData) => {
-        setOptimisticPets(addPetAction(pet));
-        const response = await addPet(pet);
+        setOptimisticPets(addPetAction({ ...pet }));
+        const response = await addPet({ ...pet });
         if (!response.ok) {
             toast.warning(response.message, { position: "top-center" });
         }

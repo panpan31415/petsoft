@@ -11,6 +11,7 @@ import { flushSync } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { petFormSchema } from "@/lib/validation";
+import { useSession } from "next-auth/react";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
@@ -20,7 +21,6 @@ export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => vo
         trigger,
         getValues,
     } = useForm<PetFormData>({ resolver: zodResolver(petFormSchema) });
-
     const formActionHandler = async () => {
         const result = await trigger();
         if (!result) {

@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 import AddPetForm from "./add-pet-form";
 import { useState } from "react";
+import { SessionProvider } from "next-auth/react";
 
 export default function AddPetButton() {
     const [open, setOpen] = useState(false);
@@ -23,7 +24,9 @@ export default function AddPetButton() {
                 <DialogHeader>
                     <DialogTitle>Add a new pet</DialogTitle>
                 </DialogHeader>
-                <AddPetForm setOpen={setOpen} />
+                <SessionProvider>
+                    <AddPetForm setOpen={setOpen} />
+                </SessionProvider>
             </DialogContent>
         </Dialog>
     );
