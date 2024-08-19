@@ -5,15 +5,13 @@ import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
 import { PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
-import { petFormSchema } from "@/lib/validation";
-import { auth, signIn, signOut } from "@/lib/auth";
+import { petFormSchema, petIdSchema } from "@/lib/validation";
+import { signIn, signOut } from "@/lib/auth";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
+import { checkSession } from "@/lib/server-utils";
 export async function addPet(pet: PetFormData) {
-    const session = await auth();
-    if (!session?.user) {
-        redirect("/login");
-    }
+    const session = await checkSession();
+
     let response = {
         ok: false,
         message: "",
@@ -37,7 +35,7 @@ export async function addPet(pet: PetFormData) {
                 imageUrl: validatedPet.data.imageUrl,
                 notes: validatedPet.data.notes,
                 user: {
-                    connect: { id: session.user.id },
+                    connect: { id: session?.user?.id },
                 },
             },
         });
@@ -57,6 +55,28 @@ export async function addPet(pet: PetFormData) {
 }
 
 export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
+    const session = await checkSession();
+
+    const pet = await prisma.pet.findUnique({
+        where: {
+            id: newPet.id,
+        },
+    });
+
+    if (!pet) {
+        return {
+            ok: false,
+            message: "no pet found",
+        };
+    }
+
+    if (pet.userId !== session.user?.id) {
+        return {
+            ok: false,
+            message: "Not authorized",
+        };
+    }
+
     let response = {
         ok: false,
         message: "",
@@ -69,7 +89,6 @@ export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
             error: validatedPet.error,
         };
     }
-    await sleep(2000);
 
     try {
         await prisma.pet.update({
@@ -100,17 +119,39 @@ export async function editPet(newPet: PetFormData & { id: Pet["id"] }) {
     }
 }
 
-export async function deletePet(id: Pet["id"]) {
-    await sleep(2000);
+export async function deletePet(id: string) {
+    const validatedPetId = await petIdSchema.parseAsync(id);
+    const session = await checkSession();
     let response = {
         ok: false,
         message: "",
     };
 
+    const pet = await prisma.pet.findUnique({
+        where: {
+            id: validatedPetId,
+        },
+    });
+
+    if (!pet) {
+        return {
+            ok: false,
+            message: "no pet found",
+        };
+    }
+
+    if (pet.userId !== session?.user?.id) {
+        return {
+            ok: false,
+            message: "Not authorized",
+        };
+    }
+
     try {
         await prisma.pet.delete({
             where: {
                 id,
+                userId: session.user.id,
             },
         });
         response = {

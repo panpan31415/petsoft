@@ -11,7 +11,6 @@ import { flushSync } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { petFormSchema } from "@/lib/validation";
-import { useSession } from "next-auth/react";
 
 export default function AddPetForm({ setOpen }: { setOpen: (open: boolean) => void }) {
     const petContext = usePetContext();
