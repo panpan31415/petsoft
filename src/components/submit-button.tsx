@@ -7,11 +7,13 @@ type SubmitFromButtonProps = {
     children: ReactNode;
     className?: ClassNameValue;
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined;
+    disabled?: boolean;
 };
 
-export default function SubmitFromButton({ children, className, variant }: SubmitFromButtonProps) {
+export default function SubmitFromButton({ children, className, variant, disabled = false }: SubmitFromButtonProps) {
     return (
         <Button
+            disabled={disabled}
             variant={variant}
             type='submit'
             className={cn(`rounded-full`, className)}>

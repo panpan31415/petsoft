@@ -3,9 +3,9 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
-import { PetFormData } from "@/lib/types";
+import { FormState, PetFormData } from "@/lib/types";
 import { Pet } from "@prisma/client";
-import { petFormSchema, petIdSchema } from "@/lib/validation";
+import { authFormSchema, petFormSchema, petIdSchema } from "@/lib/validation";
 import { signIn, signOut } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { checkSession } from "@/lib/server-utils";
@@ -169,9 +169,23 @@ export async function deletePet(id: string) {
     }
 }
 
-export async function login(formData: FormData) {
-    // this signIn will pass authData to credential function in authorize function of auth module
-    await signIn("credentials", formData);
+export async function login(state: FormState, formData: FormData) {
+    if (!(formData instanceof FormData)) {
+        return {
+            error: "Invalid form data",
+        };
+    }
+
+    try {
+        await signIn("credentials", formData);
+        return {
+            message: "sign in succeeded",
+        };
+    } catch (error) {
+        return {
+            error,
+        };
+    }
 }
 
 export async function signOutAction() {
@@ -180,9 +194,15 @@ export async function signOutAction() {
     });
 }
 
-export async function signUp(formData: FormData) {
-    const email = formData.get("email") as string;
-    const hashedPassword = await bcrypt.hash(formData.get("password") as string, 10);
+export async function signUp(state: FormState, formData: FormData) {
+    const validatedFrom = await authFormSchema.safeParseAsync(formData);
+
+    if (!validatedFrom.success) {
+        return { error: "Invalid form data" };
+    }
+    const { email, password } = validatedFrom.data;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     try {
         await prisma.user.create({
             data: {
@@ -190,8 +210,12 @@ export async function signUp(formData: FormData) {
                 hashedPassword,
             },
         });
-        await signIn("credentials", formData);
+        return {
+            message: "login succeeded",
+        };
     } catch (error) {
-        console.log(error);
+        return {
+            error,
+        };
     }
 }

@@ -74,7 +74,6 @@ const config: NextAuthConfig = {
             }
             return false;
         },
-
         redirect: async ({ url, baseUrl }) => {
             if (url) {
                 return url;
@@ -101,4 +100,9 @@ const config: NextAuthConfig = {
     },
 };
 
-export const { auth, signIn, signOut } = NextAuth(config);
+export const {
+    auth,
+    signIn,
+    signOut,
+    handlers: { GET, POST },
+} = NextAuth(config);
